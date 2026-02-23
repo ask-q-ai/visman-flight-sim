@@ -1,0 +1,15 @@
+{
+  "id": "flight-sim",
+  "name": "Flight Sim",
+  "description": "Exported from embedded Flutter VisMan demo scene \"flight-sim\".",
+  "tags": [
+    "flight",
+    "sim"
+  ],
+  "source": "flutter-embedded-demo",
+  "generatedAt": "2026-02-23T08:11:45.557246Z",
+  "sceneFile": "visman.json",
+  "objectCount": 3,
+  "hasPhysics": true,
+  "has3D": true
+}

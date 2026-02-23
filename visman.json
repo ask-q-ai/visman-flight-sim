@@ -1,0 +1,253 @@
+{
+  "initial_vm_state": {
+    "yaw": 0.0,
+    "pitch": 0.0,
+    "speed": 15.0,
+    "yaw_delta": 0.0
+  },
+  "stateConstraints": [
+    {
+      "path": "vm.yaw",
+      "mode": "wrap",
+      "min": -3.141592653589793,
+      "max": 3.141592653589793
+    },
+    {
+      "path": "vm.pitch",
+      "mode": "clamp",
+      "min": -0.6,
+      "max": 0.6
+    },
+    {
+      "path": "vm.speed",
+      "mode": "clamp",
+      "min": 0.0,
+      "max": 80.0
+    }
+  ],
+  "googleEarth": {
+    "enabled": true,
+    "latitude": 37.7749,
+    "longitude": -122.4194,
+    "initialZoom": 17,
+    "initialTilt": 60,
+    "initialBearing": 0,
+    "mode": "HYBRID",
+    "mapId": "DEMO_MAP_ID",
+    "initialRange": 1600,
+    "credentialAlias": "google-maps",
+    "bindYaw": "@vm.yaw",
+    "bindPitch": "@vm.pitch",
+    "bindSpeed": "@vm.speed",
+    "speedToGeoScale": 0.00001
+  },
+  "camera": {
+    "followTarget": "plane",
+    "followOffset": {
+      "x": 0,
+      "y": 1.5,
+      "z": 6
+    },
+    "followSmoothing": 0.12,
+    "fov": 75,
+    "enableControls": false
+  },
+  "lights": [
+    {
+      "id": "sun",
+      "type": "directional",
+      "color": "#FFFFFF",
+      "intensity": 1.5,
+      "position": {
+        "x": 100,
+        "y": 100,
+        "z": 50
+      }
+    },
+    {
+      "id": "ambient",
+      "type": "ambient",
+      "color": "#FFFFFF",
+      "intensity": 0.5
+    }
+  ],
+  "threeJsLayer": [
+    {
+      "id": "plane",
+      "context": "threejs",
+      "type": "box",
+      "position": {
+        "x": 0,
+        "y": 15,
+        "z": 0
+      },
+      "rotation": {
+        "x": "{{ @vm.pitch }}",
+        "y": "{{ @vm.yaw }}",
+        "z": "{{ @vm.yaw_delta }}"
+      },
+      "size": {
+        "width": 1.0,
+        "height": 0.3,
+        "depth": 1.5
+      },
+      "material": {
+        "color": "#F2F7FF",
+        "usePbr": true,
+        "roughness": 0.24,
+        "metalness": 0.68,
+        "clearcoat": 0.82,
+        "clearcoatRoughness": 0.12
+      },
+      "physics": {
+        "kinematic": true,
+        "bodyType": "kinematic",
+        "forwardSpeedPath": "speed",
+        "minForwardSpeed": 0,
+        "maxForwardSpeed": 80
+      },
+      "actions": {
+        "steer_left": {
+          "stateMutations": [
+            {
+              "path": "vm.yaw",
+              "operation": "add_wrapped",
+              "value": 0.04,
+              "min": -3.141592653589793,
+              "max": 3.141592653589793
+            },
+            {
+              "path": "vm.yaw_delta",
+              "operation": "set",
+              "value": 1.0
+            }
+          ]
+        },
+        "steer_right": {
+          "stateMutations": [
+            {
+              "path": "vm.yaw",
+              "operation": "add_wrapped",
+              "value": -0.04,
+              "min": -3.141592653589793,
+              "max": 3.141592653589793
+            },
+            {
+              "path": "vm.yaw_delta",
+              "operation": "set",
+              "value": -1.0
+            }
+          ]
+        },
+        "steer_up": {
+          "stateMutations": [
+            {
+              "path": "vm.pitch",
+              "operation": "add_clamped",
+              "value": 0.02,
+              "min": -0.6,
+              "max": 0.6
+            }
+          ]
+        },
+        "steer_down": {
+          "stateMutations": [
+            {
+              "path": "vm.pitch",
+              "operation": "add_clamped",
+              "value": -0.02,
+              "min": -0.6,
+              "max": 0.6
+            }
+          ]
+        },
+        "reset_roll": {
+          "stateMutations": [
+            {
+              "path": "vm.yaw_delta",
+              "operation": "set",
+              "value": 0.0
+            }
+          ]
+        },
+        "throttle_up": {
+          "stateMutations": [
+            {
+              "path": "vm.speed",
+              "operation": "add_clamped",
+              "value": 5.0,
+              "min": 0.0,
+              "max": 80.0
+            }
+          ]
+        },
+        "throttle_down": {
+          "stateMutations": [
+            {
+              "path": "vm.speed",
+              "operation": "add_clamped",
+              "value": -5.0,
+              "min": 0.0,
+              "max": 80.0
+            }
+          ]
+        }
+      },
+      "callbacks": {
+        "onKeyHeld": {
+          "ArrowLeft": "steer_left",
+          "ArrowRight": "steer_right",
+          "ArrowUp": "steer_up",
+          "ArrowDown": "steer_down"
+        },
+        "onKeyDown": {
+          "w": "throttle_up",
+          "s": "throttle_down",
+          "W": "throttle_up",
+          "S": "throttle_down"
+        },
+        "onKeyUp": {
+          "ArrowLeft": "reset_roll",
+          "ArrowRight": "reset_roll"
+        }
+      }
+    }
+  ],
+  "domLayer": [
+    {
+      "id": "hud",
+      "context": "dom",
+      "type": "div",
+      "position": {
+        "x": 20,
+        "y": 15
+      },
+      "properties": {
+        "text": "SPD {{ @vm.speed }} | YAW {{ @vm.yaw }}"
+      },
+      "style": {
+        "color": "#00FF00",
+        "fontSize": 16,
+        "fontFamily": "monospace",
+        "fontWeight": "bold"
+      }
+    },
+    {
+      "id": "controls",
+      "context": "dom",
+      "type": "div",
+      "position": {
+        "x": 20,
+        "y": 330
+      },
+      "properties": {
+        "text": "ARROWS steer | W/S throttle"
+      },
+      "style": {
+        "color": "rgba(255,255,255,0.6)",
+        "fontSize": 13,
+        "fontFamily": "monospace"
+      }
+    }
+  ]
+}
